@@ -94,7 +94,6 @@ class HTTPClient(object):
 
     def POST(self, url, args=None):
         # Get the host and port from url
-        # https://docs.python.org/2/library/urlparse.html 2016-01-23
         host, port, path = self.parse_url(url);
 
         if args != None:

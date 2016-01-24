@@ -17,3 +17,12 @@ examples thus some of the code is Copyright © 2001-2013 Python
 Software Foundation; All Rights Reserved under the PSF license (GPL
 compatible) http://docs.python.org/2/library/socketserver.html
 
+Sources:
+
+http://www.binarytides.com/python-socket-programming-tutorial/ 2016-01-23
+
+
+https://docs.python.org/2/library/urllib.html#examples 2016-01-23
+
+
+https://docs.python.org/2/library/urlparse.html 2016-01-23
