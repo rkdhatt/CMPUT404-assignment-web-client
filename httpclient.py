@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-# Copyright 2013 Abram Hindle
+# Copyright 2013 Abram Hindle, Raman Dhatt
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 import sys
 import socket
 import re
+import random
 # you may use urllib to encode data appropriately
 import urllib
 from urlparse import urlparse
@@ -41,7 +42,7 @@ class HTTPClient(object):
         print 'Socket created'
 
         #Connect to remote server
-        s.connect((host , port))
+        s.connect((host , int(port)))
         return s
 
     def get_code(self, data):
@@ -66,8 +67,28 @@ class HTTPClient(object):
         return str(buffer)
 
     def GET(self, url, args=None):
-        code = 500
-        body = ""
+        host, port, path = self.parse_url(url);
+
+        sock = self.connect(host, port)
+
+        try:
+            sock.sendall("GET " + path + " HTTP/1.1\r\n".encode("UTF8"))
+            sock.sendall("Host: " + host+":"+str(port)+"\r\n".encode("UTF8"))
+            sock.sendall("Connection: close\r\n\r\n".encode("UTF8"))
+
+        except socket.error:
+            #Send failed
+            print 'Send failed'
+            return None
+
+        reply = self.recvall(sock)
+        sock.close()
+
+        print(reply)
+
+        code = self.get_code(reply)
+        body = self.get_body(reply)
+
         return HTTPRequest(code, body)
 
     def POST(self, url, args=None):
@@ -85,16 +106,16 @@ class HTTPClient(object):
         sock = self.connect(host, port)
 
         try:
-            # print 'Sending HEADERS...'
-            sock.sendall("POST " + path + " HTTP/1.1\r\n".encode("UTF8"))
-            sock.sendall("Host: " + host+":"+str(port)+"\r\n".encode("UTF8"))
-            sock.sendall("Content-Type: application/x-www-form-urlencoded\r\n".encode("UTF8"))
-            sock.sendall("Content-Length: "+content_length+"\r\n".encode("UTF8"))
-            sock.sendall("Connection: close\r\n\r\n".encode("UTF8"))
+            message = "POST " + path + " HTTP/1.1\r\n" \
+                "Host: " + host+":"+str(port)+"\r\n" \
+                "Content-Length: "+content_length+"\r\n" \
+                "Connection: close\r\n"
 
             if data != "":
                 # print 'Sending BODY...'
-                sock.sendall(data+"\r\n\r\n".encode("UTF8"))
+                sock.sendall(message + data + "\r\n\r\n")
+            else:
+                sock.sendall(message + "\r\n\r\n")
 
         except socket.error:
             #Send failed
@@ -103,9 +124,9 @@ class HTTPClient(object):
 
         #Now recieve data
         reply = self.recvall(sock)
-        print(reply)
-
         sock.close()
+
+        print(reply)
 
         code = self.get_code(reply)
         body = self.get_body(reply)
@@ -123,11 +144,14 @@ class HTTPClient(object):
         # obtain following information: hostname, port, path
         url_parse = urlparse(url)
         host_name = url_parse.hostname
+        
         path = url_parse.path
-        port = url_parse.port
+        if path == "":
+            path = "/"
 
+        port = url_parse.port
         if port == None:
-            port = 8080
+            port = 27600 + random.randint(1,100)
 
         return host_name, port, path
 
