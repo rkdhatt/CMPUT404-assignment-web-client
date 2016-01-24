@@ -111,6 +111,7 @@ class HTTPClient(object):
             message = "POST " + path + " HTTP/1.1\r\n" \
                 "Host: " + host+":"+str(port)+"\r\n" \
                 "Content-Length: "+content_length+"\r\n" \
+                "Content-Type: application/x-www-form-urlencoded" \
                 "Connection: close\r\n\r\n"
 
             if data != "":
