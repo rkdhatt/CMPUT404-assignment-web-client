@@ -21,7 +21,6 @@
 import sys
 import socket
 import re
-import random
 # you may use urllib to encode data appropriately
 import urllib
 from urlparse import urlparse
@@ -47,6 +46,7 @@ class HTTPClient(object):
         return s
 
     def get_code(self, data):
+        # return integer value of the code recieved from the reply.
         return int(data.split()[1])
 
     def get_headers(self,data):
@@ -69,19 +69,19 @@ class HTTPClient(object):
 
     def GET(self, url, args=None):
         host, port, path = self.parse_url(url);
-
         sock = self.connect(host, port)
 
         try:
-            sock.sendall("GET " + path + " HTTP/1.1\r\n".encode("UTF8"))
-            sock.sendall("Host: " + host+":"+str(port)+"\r\n".encode("UTF8"))
-            sock.sendall("Connection: close\r\n\r\n".encode("UTF8"))
+            sock.sendall("GET " + path + " HTTP/1.1\r\n".encode("utf-8"))
+            sock.sendall("Host: " + host+":"+str(port)+"\r\n".encode("utf-8"))
+            sock.sendall("Connection: close\r\n\r\n".encode("utf-8"))
 
         except socket.error:
             #Send failed
             print 'Send failed'
             return None
 
+        print "Recieving data from GET request..."
         reply = self.recvall(sock)
         sock.close()
 
@@ -137,7 +137,7 @@ class HTTPClient(object):
         headers = self.get_headers(reply)
         # print "\nHTTP POST REQUEST RESULT:\n"
         # print reply.split("\r\n\r\n")
-        print "CODE: "+ str(code)
+        print "CODE REPLY: "+ str(code)
         # print "HEADERS: "+headers
         # print "BODY: "+body
         # print
@@ -155,7 +155,7 @@ class HTTPClient(object):
 
         port = url_parse.port
         if port == None:
-            port = 27600 + random.randint(1,100)
+            port = 80 # From lecture notes - assume TCP port 80 if no port specified.
 
         return host_name, port, path
 
