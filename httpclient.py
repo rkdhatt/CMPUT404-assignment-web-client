@@ -72,20 +72,20 @@ class HTTPClient(object):
         sock = self.connect(host, port)
 
         try:
-            sock.sendall("GET " + path + " HTTP/1.1\r\n".encode("utf-8"))
-            sock.sendall("Host: " + host+":"+str(port)+"\r\n".encode("utf-8"))
-            sock.sendall("Connection: close\r\n\r\n".encode("utf-8"))
+            sock.sendall(("GET " + path + " HTTP/1.1\r\n").encode("utf-8"))
+            sock.sendall(("Host: " + host+":"+str(port)+"\r\n").encode("utf-8"))
+            sock.sendall(("Connection: close\r\n\r\n").encode("utf-8"))
 
         except socket.error:
             #Send failed
             print 'Send failed'
             return None
 
-        print "Recieving data from GET request..."
+        print "Recieving data from GET request...\n"
         reply = self.recvall(sock)
         sock.close()
 
-        print(reply)
+        print("RESPONSE:\n"+reply+"\n")
 
         code = self.get_code(reply)
         body = self.get_body(reply)
@@ -94,6 +94,7 @@ class HTTPClient(object):
 
     def POST(self, url, args=None):
         # Get the host and port from url
+        # https://docs.python.org/2/library/urlparse.html 2016-01-23
         host, port, path = self.parse_url(url);
 
         if args != None:
@@ -107,18 +108,14 @@ class HTTPClient(object):
         sock = self.connect(host, port)
 
         try:
-            message = "POST " + path + " HTTP/1.1\r\n" \
-                "Host: " + host+":"+str(port)+"\r\n" \
-                "Content-Length: "+content_length+"\r\n" \
-                "Content-Type: application/x-www-form-urlencoded" \
-                "Connection: close\r\n\r\n"
+            sock.sendall(("POST " + path + " HTTP/1.1\r\n").encode("utf-8"))
+            sock.sendall(("Host: " + host+":"+str(port)+"\r\n").encode("utf-8"))
+            sock.sendall(("Content-Length: "+content_length+"\r\n").encode("utf-8"))
+            sock.sendall(("Content-Type: application/x-www-form-urlencoded+\r\n"))
+            sock.sendall(("Connection: close\r\n\r\n").encode("utf-8"))
 
             if data != "":
-                # print 'Sending BODY...'
-                message += data
-                sock.sendall(message.encode("utf-8"))
-            else:
-                sock.sendall(message.encode("utf-8"))
+                sock.sendall(data.encode("utf-8"))
 
         except socket.error:
             #Send failed
@@ -126,18 +123,18 @@ class HTTPClient(object):
             return None
 
         #Now recieve data
-        print "Recieving data..."
+        print "Recieving data from POST request...\n"
         reply = self.recvall(sock)
         sock.close()
 
-        print(reply)
+        print("RESPONSE:\n"+reply+"\n")
 
         code = self.get_code(reply)
         body = self.get_body(reply)
         headers = self.get_headers(reply)
         # print "\nHTTP POST REQUEST RESULT:\n"
         # print reply.split("\r\n\r\n")
-        print "CODE REPLY: "+ str(code)
+        # print "CODE REPLY: "+ str(code)
         # print "HEADERS: "+headers
         # print "BODY: "+body
         # print
