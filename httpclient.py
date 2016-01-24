@@ -42,11 +42,12 @@ class HTTPClient(object):
         print 'Socket created'
 
         #Connect to remote server
+        print 'Connecting to remote server...'
         s.connect((host , int(port)))
         return s
 
     def get_code(self, data):
-        return data.split()[1]
+        return int(data.split()[1])
 
     def get_headers(self,data):
         return data.split("\r\n\r\n")[0]
@@ -98,6 +99,7 @@ class HTTPClient(object):
 
         if args != None:
             data = urllib.urlencode(args)
+            print "Args: " + data
             content_length = str(len(data))
         else:
             data = ""
@@ -109,13 +111,14 @@ class HTTPClient(object):
             message = "POST " + path + " HTTP/1.1\r\n" \
                 "Host: " + host+":"+str(port)+"\r\n" \
                 "Content-Length: "+content_length+"\r\n" \
-                "Connection: close\r\n"
+                "Connection: close\r\n\r\n"
 
             if data != "":
                 # print 'Sending BODY...'
-                sock.sendall(message + data + "\r\n\r\n")
+                message += data
+                sock.sendall(message.encode("utf-8"))
             else:
-                sock.sendall(message + "\r\n\r\n")
+                sock.sendall(message.encode("utf-8"))
 
         except socket.error:
             #Send failed
@@ -123,6 +126,7 @@ class HTTPClient(object):
             return None
 
         #Now recieve data
+        print "Recieving data..."
         reply = self.recvall(sock)
         sock.close()
 
@@ -133,7 +137,7 @@ class HTTPClient(object):
         headers = self.get_headers(reply)
         # print "\nHTTP POST REQUEST RESULT:\n"
         # print reply.split("\r\n\r\n")
-        # print "CODE: "+code
+        print "CODE: "+ str(code)
         # print "HEADERS: "+headers
         # print "BODY: "+body
         # print
