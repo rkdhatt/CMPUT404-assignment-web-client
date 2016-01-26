@@ -28,7 +28,7 @@ from urlparse import urlparse
 def help():
     print "httpclient.py [GET/POST] [URL]\n"
 
-class HTTPRequest(object):
+class HTTPResponse(object):
     def __init__(self, code=200, body=""):
         self.code = code
         self.body = body
@@ -90,7 +90,7 @@ class HTTPClient(object):
         code = self.get_code(reply)
         body = self.get_body(reply)
 
-        return HTTPRequest(code, body)
+        return HTTPResponse(code, body)
 
     def POST(self, url, args=None):
         # Get the host and port from url
@@ -99,7 +99,7 @@ class HTTPClient(object):
 
         if args != None:
             data = urllib.urlencode(args)
-            print "Args: " + data
+            # print "Args: " + data
             content_length = str(len(data))
         else:
             data = ""
@@ -111,18 +111,18 @@ class HTTPClient(object):
             sock.sendall(("POST " + path + " HTTP/1.1\r\n").encode("utf-8"))
             sock.sendall(("Host: " + host+":"+str(port)+"\r\n").encode("utf-8"))
             sock.sendall(("Content-Length: "+content_length+"\r\n").encode("utf-8"))
-            sock.sendall(("Content-Type: application/x-www-form-urlencoded+\r\n"))
+            sock.sendall(("Content-Type: application/x-www-form-urlencoded+\r\n").encode("utf-8"))
             sock.sendall(("Connection: close\r\n\r\n").encode("utf-8"))
 
             if data != "":
                 sock.sendall(data.encode("utf-8"))
 
         except socket.error:
-            #Send failed
+            # Send failed
             print 'Send failed'
             return None
 
-        #Now recieve data
+        # Now recieve data
         print "Recieving data from POST request...\n"
         reply = self.recvall(sock)
         sock.close()
@@ -138,7 +138,7 @@ class HTTPClient(object):
         # print "HEADERS: "+headers
         # print "BODY: "+body
         # print
-        return HTTPRequest(code, body)
+        return HTTPResponse(code, body)
 
 
     def parse_url(self, url):
