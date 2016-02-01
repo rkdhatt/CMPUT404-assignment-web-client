@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
+<<<<<<< HEAD
 # Copyright 2013 Abram Hindle, Raman Dhatt
+=======
+# Copyright 2016 Abram Hindle, https://github.com/tywtyw2002, and https://github.com/treedust
+>>>>>>> 10ad7884407a205ac7308b9b83436966cabd8898
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -68,6 +72,7 @@ class HTTPClient(object):
         return str(buffer)
 
     def GET(self, url, args=None):
+<<<<<<< HEAD
         host, port, path = self.parse_url(url);
         sock = self.connect(host, port)
 
@@ -155,6 +160,16 @@ class HTTPClient(object):
             port = 80 # From lecture notes - assume TCP port 80 if no port specified.
 
         return host_name, port, path
+=======
+        code = 500
+        body = ""
+        return HTTPResponse(code, body)
+
+    def POST(self, url, args=None):
+        code = 500
+        body = ""
+        return HTTPResponse(code, body)
+>>>>>>> 10ad7884407a205ac7308b9b83436966cabd8898
 
     def command(self, url, command="GET", args=None):
         if (command == "POST"):
@@ -169,6 +184,6 @@ if __name__ == "__main__":
         help()
         sys.exit(1)
     elif (len(sys.argv) == 3):
-        print client.command( sys.argv[1], sys.argv[2] )
+        print client.command( sys.argv[2], sys.argv[1] )
     else:
-        print client.command( command, sys.argv[1] )    
+        print client.command( sys.argv[1] )   
